@@ -1,14 +1,12 @@
 // imgmin — image minification script
 //
 // example usage: node imgmin.js dim=2000 in="/path/to/folder/INPUT" out="/path/to/folder/OUTPUT"
+// warning: folders must exist
 //
 // arguments list:
-//
 // dim: Number — max width or height of image. Default: 2000
-//
 // in:  String — path to input  folder. Default: "./input"
 // out: String — path to output folder. Defalut: "./output"
-//
 // destructive: Boolean — if set to true removes input files after compression
 
 import dirTree from "directory-tree";
