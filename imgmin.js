@@ -22,24 +22,35 @@ process.argv.forEach((el) => {
   }
 });
 
+const debug = args.debug === "true" ? true : false
 const dim = parseInt(args.dim) || 2000;
 const folderInput = args.in || "input";
 const folderOutput = args.out || "output";
 const destructive = args.destructive === "true" ? true : false;
 
 const tree = dirTree(folderInput);
+const outt = dirTree(folderOutput);
 
-tree.children.map((img) => {
-  sharp(img.path)
-    .resize(dim, dim, { fit: "outside", withoutEnlargement: true })
-    .toFile(`${folderOutput}\\${img.name}`, (err, info) => {
-      if (err) console.log(err);
+const names1 = new Set(tree.children.map(img => img.name))
+const names2 = new Set(outt.children.map(img => img.name))
 
-      const percent = ((info.size / img.size) * 100).toFixed(2);
-      console.log(`${img.name}\t${img.size} -> ${info.size}\t ${percent}%`);
+const diff = new Set([...names1].filter(x => !names2.has(x)));
 
-      if (destructive) {
-        rimraf(img.path, (err) => (err ? console.log(err) : null));
-      }
-    });
-});
+tree.children
+  .filter((img) => (diff.has(img.name)))
+  .map((img) => {
+    sharp(img.path)
+      .resize(dim, dim, { fit: "outside", withoutEnlargement: true })
+      .toFile(`${folderOutput}\\${img.name}`, (err, info) => {
+        if (err) console.log(err);
+
+        if (debug) {
+          const percent = ((info.size / img.size) * 100).toFixed(2);
+          console.log(`${img.name}\t${img.size} -> ${info.size}\t ${percent}%`);
+        }
+
+        if (destructive) {
+          rimraf(img.path, (err) => (err ? console.log(err) : null));
+        }
+      });
+  });
